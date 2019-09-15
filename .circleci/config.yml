@@ -64,6 +64,15 @@ jobs:
             echo "Build Native Image"
             lein native-image
 
+      - run:
+          command: |
+            mkdir artifacts
+            cp target/uberjar/*.jar artifacts/
+            cp target/base+system+user+dev+uberjar/mule-metadata-extractor* artifacts/mule-metadata-extractor-linux-amd64-${CIRCLE_TAG}
+
+      - store_artifacts:
+          path: artifacts
+
   deploy:
     docker:
       - image: circleci/golang
@@ -83,21 +92,13 @@ jobs:
               --pre-release
       - run:
           command: |
-            gothub upload \
-              --user "${CIRCLE_PROJECT_USERNAME}" \
-              --repo "${CIRCLE_PROJECT_REPONAME}" \
-              --tag "${CIRCLE_TAG}" \
-              --name "mule-metadata-extractor-linux-amd64-${CIRCLE_TAG}" \
-              --file target/base+system+user+dev+uberjar/mule-metadata-extractor
-      - run:
-          command: |
-            for jar_file in target/uberjar/*.jar; do
+            for file in artifacts/*; do
               gothub upload \
                 --user "${CIRCLE_PROJECT_USERNAME}" \
                 --repo "${CIRCLE_PROJECT_REPONAME}" \
                 --tag "${CIRCLE_TAG}" \
-                --name $(basename "$jar_file") \
-                --file "${jar_file}"
+                --name $(basename "$file") \
+                --file "${file}"
             done
 workflows:
   version: 2
