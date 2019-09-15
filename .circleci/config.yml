@@ -11,7 +11,9 @@ jobs:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       ARCHIVE: AnypointStudio66.tar.gz
-      JABBA_HOME: $CIRCLE_WORKING_DIRECTORY/.jabba
+      JABBA_HOME: /tmp/.jabba
+      GITHUB_USER: agiledigital
+      GITHUB_REPO: mule-metadata-extractor
       ANYPOINT_STUDIO_URL: https://mule-studio.s3.amazonaws.com/6.6.1-U1/AnypointStudio-for-linux-64bit-6.6.1-201906072050.tar.gz
       # TODO: Test against Anypoint Studio 7/Mule 4
       # ARCHIVE: AnypointStudio73.tar.gz
@@ -19,6 +21,9 @@ jobs:
 
     steps:
       - checkout
+
+      - run: sudo apt-get update
+      - run: sudo apt-get install build-essential libz-dev
 
       # Download and cache dependencies
       - restore_cache:
@@ -49,7 +54,50 @@ jobs:
       - run:
           command: |
             # Run in the same shell so that we don't lose environment variables
-            curl -sL https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | bash && . "${JABBA_HOME}/jabba.sh"
+            echo "Installing Jabba"
+            curl -sL https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | bash
+            echo "Initialise Jabba at [${JABBA_HOME}]"
+            . "${JABBA_HOME}/jabba.sh"
+            echo "Install GraalVM"
             jabba install graalvm@19.2.0
             gu install native-image
+            echo "Build Native Image"
             lein native-image
+
+  deployment:
+    trigger_tag:
+      tag: /v.+/
+    docker:
+      - image: circleci/golang
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: go get github.com/itchio/gothub
+      - run: gothub info -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}"
+      - run:
+          command: |
+            gothub release \
+              --user "${CIRCLE_PROJECT_USERNAME}" \
+              --repo "${CIRCLE_PROJECT_REPONAME}" \
+              --tag "${CIRCLE_TAG}" \
+              --name "Release ${CIRCLE_TAG}" \
+              --description "Automated release of the latest version" \
+              --pre-release
+      - run:
+          command: |
+            gothub upload \
+              --user "${CIRCLE_PROJECT_USERNAME}" \
+              --repo "${CIRCLE_PROJECT_REPONAME}" \
+              --tag "${CIRCLE_TAG}" \
+              --name "mule-metadata-extractor-linux-amd64-${CIRCLE_TAG}" \
+              --file target/base+system+user+dev+uberjar/mule-metadata-extractor
+      - run:
+          command: |
+            for jar_file in target/uberjar/*.jar; do
+              gothub upload \
+                --user "${CIRCLE_PROJECT_USERNAME}" \
+                --repo "${CIRCLE_PROJECT_REPONAME}" \
+                --tag "${CIRCLE_TAG}" \
+                --name $(basename "$jar_file") \
+                --file "${jar_file}"
+            done

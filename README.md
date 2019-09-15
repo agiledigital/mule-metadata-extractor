@@ -1,5 +1,7 @@
 ## Mule Metadata Extractor
 
+[![CircleCI](https://circleci.com/gh/agiledigital/mule-metadata-extractor.svg?style=svg)](https://circleci.com/gh/agiledigital/mule-metadata-extractor)
+
 Command line tools to extract metadata from Anypoint Studio installations.
 
 Used in the [Mule Preview](https://github.com/agiledigital/mule-preview) project.
