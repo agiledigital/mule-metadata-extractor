@@ -66,9 +66,11 @@ jobs:
 
       - run:
           command: |
+            PROJECT_VERSION=$(lein project-version)
             mkdir artifacts
             cp target/uberjar/*.jar artifacts/
-            cp target/base+system+user+dev+uberjar/mule-metadata-extractor* artifacts/
+            cp target/base+system+user+dev+uberjar/mule-metadata-extractor-${PROJECT_VERSION} \
+              artifacts/mule-metadata-extractor-linux-amd64-${CIRCLE_TAG:-CIRCLE_BRANCH}
 
       - store_artifacts:
           path: artifacts

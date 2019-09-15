@@ -9,7 +9,8 @@
                  [cheshire "5.8.1"]]
   :main ^:skip-aot mule-preview.tools.core
   :target-path "target/%s"
-  :plugins [[io.taylorwood/lein-native-image "0.3.1"]]
+  :plugins [[io.taylorwood/lein-native-image "0.3.1"]
+            [lein-project-version "0.1.0"]]
   :native-image {:opts ["--no-server"
                         "--report-unsupported-elements-at-runtime"
                         "--initialize-at-build-time"
