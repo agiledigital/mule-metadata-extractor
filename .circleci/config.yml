@@ -64,16 +64,6 @@ jobs:
             echo "Build Native Image"
             lein native-image
 
-      - run: gothub info -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}"
-      - run:
-          command: |
-            gothub release \
-              --user "${CIRCLE_PROJECT_USERNAME}" \
-              --repo "${CIRCLE_PROJECT_REPONAME}" \
-              --tag "${CIRCLE_TAG}" \
-              --name "Release ${CIRCLE_TAG}" \
-              --description "Automated release of the latest version" \
-              --pre-release
   deployment:
     trigger_tag:
       tag: /v.+/
@@ -83,6 +73,7 @@ jobs:
     steps:
       - checkout
       - run: go get github.com/itchio/gothub
+      - run: gothub info -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}"
       - run:
           command: |
             gothub release \
