@@ -72,6 +72,11 @@ jobs:
             cp target/base+system+user+dev+uberjar/mule-metadata-extractor-${PROJECT_VERSION} \
               artifacts/mule-metadata-extractor-linux-amd64-${CIRCLE_TAG:-$CIRCLE_BRANCH}
 
+      - persist_to_workspace:
+          root: "."
+          paths:
+            - artifacts
+
       - store_artifacts:
           path: artifacts
 
@@ -81,6 +86,9 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: ls /tmp/workspace/artifacts
       - run: go get github.com/itchio/gothub
       - run: gothub info -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}"
       - run:
@@ -94,14 +102,15 @@ jobs:
               --pre-release
       - run:
           command: |
-            for file in artifacts/*; do
+            for artifact_file in /tmp/workspace/artifacts/*; do
               gothub upload \
                 --user "${CIRCLE_PROJECT_USERNAME}" \
                 --repo "${CIRCLE_PROJECT_REPONAME}" \
                 --tag "${CIRCLE_TAG}" \
-                --name $(basename "$file") \
-                --file "${file}"
+                --name $(basename "${artifact_file}") \
+                --file "${artifact_file}"
             done
+
 workflows:
   version: 2
   build-n-deploy:
