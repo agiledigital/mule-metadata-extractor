@@ -46,7 +46,7 @@ jobs:
       - run: lein uberjar
 
       # Native Image Build
-      - run: curl -sL https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | bash && . ~/.jabba/jabba.sh
+      - run: curl -sL https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | bash && . "${JABBA_HOME}/jabba.sh"
       - run: $JABBA_HOME/bin/jabba install
       - run: jabba install graalvm@19.2.0
       - run: gu install native-image
