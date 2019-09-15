@@ -68,7 +68,7 @@ jobs:
           command: |
             mkdir artifacts
             cp target/uberjar/*.jar artifacts/
-            cp target/base+system+user+dev+uberjar/mule-metadata-extractor* artifacts/mule-metadata-extractor-linux-amd64-${CIRCLE_TAG}
+            cp target/base+system+user+dev+uberjar/mule-metadata-extractor* artifacts/
 
       - store_artifacts:
           path: artifacts
