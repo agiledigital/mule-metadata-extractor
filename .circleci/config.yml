@@ -1,0 +1,52 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/clojure:lein-2.7.1
+
+    working_directory: ~/repo
+
+    environment:
+      LEIN_ROOT: "true"
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      ARCHIVE: AnypointStudio66.tar.gz
+      ANYPOINT_STUDIO_URL: https://mule-studio.s3.amazonaws.com/6.6.1-U1/AnypointStudio-for-linux-64bit-6.6.1-201906072050.tar.gz
+      # TODO: Test against Anypoint Studio 7/Mule 4
+      # ARCHIVE: AnypointStudio73.tar.gz
+      # ANYPOINT_STUDIO_URL: https://mule-studio.s3.amazonaws.com/7.3.5-U5/AnypointStudio-for-linux-64bit-7.3.5-201909031749.tar.gz
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "project.clj" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: lein deps
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "project.clj" }}
+
+      # Sanity Check
+      - run: curl --show-error --fail -o "${ARCHIVE}" "${ANYPOINT_STUDIO_URL}"
+      - run: tar -xzf "${ARCHIVE}"
+      - run: lein compile
+      - run: lein run -- -d "AnypointStudio" -o test/mappings generate-mappings
+      - run: lein run -- -d "AnypointStudio" -o test/images extract-images
+      - run: lein run -- -d "AnypointStudio" -o test/images apply-light-theme
+
+      # Standalone Jar Build
+      - run: lein uberjar
+
+      # Native Image Build
+      - run: curl -sL https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | bash && . ~/.jabba/jabba.sh
+      - run: $JABBA_HOME/bin/jabba install
+      - run: jabba install graalvm@19.2.0
+      - run: gu install native-image
+      - run: lein native-image
