@@ -49,7 +49,12 @@ jobs:
       - run:
           command: |
             # Run in the same shell so that we don't lose environment variables
-            curl -sL https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | bash && . "${JABBA_HOME}/jabba.sh"
+            echo "Installing Jabba"
+            curl -sL https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | bash
+            echo "Initialise Jabba at [${JABBA_HOME}]"
+            . "${JABBA_HOME}/jabba.sh"
+            echo "Install GraalVM"
             jabba install graalvm@19.2.0
             gu install native-image
+            echo "Build Native Image"
             lein native-image
