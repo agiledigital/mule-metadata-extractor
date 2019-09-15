@@ -1,44 +1,56 @@
-## Mule Preview Tools
+## Mule Metadata Extractor
 
 Command line tools to extract metadata from Anypoint Studio installations.
 
+Used in the [Mule Preview](https://github.com/agiledigital/mule-preview) project.
+
+### Help Output
+
+    This is a tool for extracting extracting information from Mule plugins
+    for use in the mule-preview client.
+
+    Usage: tools [options] action
+
+    Options:
+    -d, --anypoint-dir DIR  Anypoint Studio Directory
+    -o, --output FOLDER     Path where the generated mapping file will be written to
+    -v                      Verbosity level
+    -h, --help
+
+    Actions:
+    apply-light-theme     Extract images from the light theme plugin
+    extract-images        Extract images from plugins
+    extract-widget-types  Generate a list of possible widget types
+    generate-mappings     Generate mappings for a mule-preview client
+
 ### Extracting the Anypoint Studio Components
-
-#### Setup script
-
-The easiest way to get started is to use `setup.sh`.
-
-    ./setup.sh <Anypoint Studio Plugins Directory>
-
-This will call all the below tools with the options required to setup
-the project properly.
 
 #### Mapping extraction tool
 
-I have written a command line tool to extract a map of widget element names, to widget icons/categories.
+The `generate-mappings` command extracts widget element names mapped to icons/categories.
 It outputs JSON which can be read in by the client to render widgets correctly.
 
 For example (in the tools directory):
 
-    lein run -d /mnt/c/Tools/AnypointStudio/plugins/ -o ../client/src/mule_preview/client generate-mappings
+    lein run -d /opt/AnypointStudio/plugins/ -o ../client/src/mule_preview/client generate-mappings
 
 #### Image extraction tool
 
-I have written a command line to extract all the images (icons) associated with widgets
-and dump the into a directory
+The `extract-images` command extracts all the images (icons) associated with widgets
+and dumps them into a directory
 
 For example (in the tools directory):
 
-    lein run -d /mnt/c/Tools/AnypointStudio/plugins/ -o ../client/public/img/icons/ extract-images
+    lein run -d /opt/AnypointStudio/plugins/ -o ../client/public/img/icons/ extract-images
 
 #### Light theme
 
 The light theme plugin is a jar full of images with the same name as plugin images.
-They are meant to overwrite the plugins image file with the same name.
+The `apply-light-theme` command processes extracts these.
 
 For example (in the tools directory):
 
-    lein run -d /mnt/c/Tools/AnypointStudio/plugins/ -o ../client/public/img/icons apply-light-theme
+    lein run -d /opt/AnypointStudio/plugins/ -o ../client/public/img/icons apply-light-theme
 
 #### Getting list of possible widget types
 

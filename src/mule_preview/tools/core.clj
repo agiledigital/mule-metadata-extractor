@@ -24,7 +24,7 @@
   (->> ["This is a tool for extracting extracting information from Mule plugins"
         "for use in the mule-preview client."
         ""
-        "Usage: tools [options] action"
+        "Usage: mule-preview-extractor [options] action"
         ""
         "Options:"
         options-summary
