@@ -1,4 +1,4 @@
-(defproject mule-metadata-extractor "1.0.10"
+(defproject mule-metadata-extractor "1.0.11"
   :description "Command line tools for processing Mule XML files"
   :url "https://github.com/NoxHarmonium/mule-preview"
   :license {:name "Apache License"
