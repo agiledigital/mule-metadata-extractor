@@ -64,9 +64,7 @@ jobs:
             echo "Build Native Image"
             lein native-image
 
-  deployment:
-    trigger_tag:
-      tag: /v.+/
+  deploy:
     docker:
       - image: circleci/golang
     working_directory: ~/repo
@@ -101,3 +99,19 @@ jobs:
                 --name $(basename "$jar_file") \
                 --file "${jar_file}"
             done
+workflows:
+  version: 2
+  build-n-deploy:
+    jobs:
+      - build:
+          filters:  # required since `deploy` has tag filters AND requires `build`
+            tags:
+              only: /.*/
+      - deploy:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
