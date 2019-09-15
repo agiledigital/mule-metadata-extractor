@@ -1,4 +1,4 @@
-(defproject tools "1.0.10"
+(defproject mule-metadata-extractor "1.0.10"
   :description "Command line tools for processing Mule XML files"
   :url "https://github.com/NoxHarmonium/mule-preview"
   :license {:name "Apache License"
@@ -9,4 +9,10 @@
                  [cheshire "5.8.1"]]
   :main ^:skip-aot mule-preview.tools.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :plugins [[io.taylorwood/lein-native-image "0.3.1"]]
+  :native-image {:opts ["--no-server"
+                        "--report-unsupported-elements-at-runtime"
+                        "--initialize-at-build-time"
+                        "--verbose"]}
+  :profiles {:uberjar {:aot :all
+                       :native-image {:jvm-opts ["-Dclojure.compiler.direct-linking=true"]}}})
