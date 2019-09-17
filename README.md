@@ -1,6 +1,7 @@
 ## Mule Metadata Extractor
 
 [![CircleCI](https://circleci.com/gh/agiledigital/mule-metadata-extractor.svg?style=svg)](https://circleci.com/gh/agiledigital/mule-metadata-extractor)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fagiledigital%2Fmule-metadata-extractor.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fagiledigital%2Fmule-metadata-extractor?ref=badge_shield)
 
 Command line tools to extract metadata from Anypoint Studio installations.
 
@@ -145,3 +146,7 @@ It also contains frames to go around the new style icons which are located at
 
 You can simply overwrite the images associated with the above widgets
 with the ones from the light theme. The filenames should be the same.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fagiledigital%2Fmule-metadata-extractor.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fagiledigital%2Fmule-metadata-extractor?ref=badge_large)
