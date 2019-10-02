@@ -13,7 +13,7 @@
 (defn extract-anypoint-version [feature-xml-file]
   "Finds the org.mule.tooling.studio feature XML file
    which seems (to be a reasonable way of finding the version of Anypoint studio"
-  (when feature-xml-file 
+  (when feature-xml-file
     (let [feature-xml-contents (slurp feature-xml-file)
           parsed-xml (xml-string-to-xml feature-xml-contents)]
       (-> parsed-xml :attrs :version))))
@@ -53,8 +53,8 @@
 
 (defn is-valid-widget [widget]
   "Determines whether the specified widget XML element represents a widget or not"
-  (let [tag (:tag widget)
-        attrs (:attrs widget)]
+  (let [tag (:tag widget)]
+    (println tag tag (boolean (mule-widget-tags tag)))
     (mule-widget-tags tag)))
 
 (defn create-element-from-widget [widget]
@@ -78,11 +78,14 @@
 (defn extract-mapping-from-subpath [plugin-path sub-path read-fn]
   "Given a path to a plugin, extract the mapping for a particular sub path of the plugin
    Uses the given read-fn to extract the XML data"
-  (let [target-file-contents (read-fn plugin-path sub-path)
-        parsed-xml (xml-string-to-xml target-file-contents)
-        prefix (-> parsed-xml :attrs :prefix)
-        widgets (:content parsed-xml)]
-    (extract-mapping-from-elements widgets prefix)))
+  (let [target-file-contents (read-fn plugin-path sub-path)]
+    (if target-file-contents
+      (let [parsed-xml (xml-string-to-xml target-file-contents)
+            prefix (-> parsed-xml :attrs :prefix)
+            widgets (:content parsed-xml)]
+        (println "===> plugin-path sub-path" plugin-path sub-path)
+        (extract-mapping-from-elements widgets prefix))
+      [])))
 
 (defn extract-mappings-from-subpaths [plugin-path sub-paths read-fn]
   "Given a path to a plugin, extract the mapping for a list of sub paths

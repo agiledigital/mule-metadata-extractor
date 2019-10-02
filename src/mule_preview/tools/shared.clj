@@ -34,6 +34,7 @@
     :pattern
     :router
     :scope
+    :splitter
     :transformer
     :wizard})
 
@@ -66,7 +67,8 @@
 (def mule-widget-xpaths
   "XPath expressions for finding extensions in the plugin.xml that indicate extractable widget definitions"
   (string/join "|" ["//plugin/extension[@point='org.mule.tooling.core.contribution']/externalContribution"
-                    "//plugin/extension[@point='org.mule.tooling.core.contribution']/contribution"]))
+                    "//plugin/extension[@point='org.mule.tooling.core.contribution']/contribution"
+                    "//plugin/extension[@point='org.mule.tooling.extension.api.editorProvider']/editorProvider"]))
 
 (def mule-module-xpath
   "XPath expression for finding extensions in the plugin.xml that indicate module definitions"
@@ -87,6 +89,10 @@
 (def light-theme-jar-regex
   "A regex used when searching the jar file that contains the light theme"
   #"^.+(\/|\\)org\.mule\.tooling\.ui\.theme\.light_.+\.jar$")
+
+(def images-jar-regex
+  "A regex used when searching for the Anypoint Studio 7 images jar"
+  #"^.+(\/|\\)org\.mule\.tooling\.images_.+\.jar$")
 
 ; Widget Scanning
 
@@ -126,8 +132,13 @@
 
 (defn zip-read-fn [jar-path sub-path]
   "A read function for use with process-plugins and jar files"
-  (zu/read-file-from-zip jar-path sub-path))
+  (if (zu/zip-contains-file jar-path sub-path)
+    (zu/read-file-from-zip jar-path sub-path)
+    (println "Warning: [" jar-path "] does not contain [" sub-path "]. Returning nil")))
 
 (defn raw-read-fn [base-path sub-path]
   "A read function for use with process-plugins and raw (already extracted) plugins"
-  (slurp (concat-paths base-path sub-path)))
+  (let [full-path (concat-paths base-path sub-path)]
+    (if (.exists full-path)
+      (slurp full-path)
+      (println "Warning: [" sub-path "] not found in [" base-path "]. Returning nil"))))
